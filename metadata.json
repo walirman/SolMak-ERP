@@ -1,0 +1,7 @@
+{
+  "name": "SolMak ERP",
+  "description": "A high-performance, dark-themed business management suite featuring Finance, Inventory, HR, and Gemini-powered Support AI.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
