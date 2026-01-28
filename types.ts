@@ -83,6 +83,7 @@ export interface Transaction {
   status: string;
   isPendingDeletion?: boolean;
   supplierId?: string;
+  method?: string;
 }
 
 export interface PurchaseOrder {
@@ -146,21 +147,22 @@ export interface PayrollRecord {
   date?: string;
 }
 
-export interface LegalDoc {
+export interface LoanRecord {
   id: string;
-  title: string;
-  type: string;
-  expiryDate: string;
-  status: 'Active' | 'Expired' | 'Renewing';
+  person: string;
+  type: 'Given' | 'Taken';
+  amount: number;
+  paidAmount: number;
+  date: string;
+  status: 'Active' | 'Closed';
 }
 
-export interface OfficeTask {
+export interface DailyExpense {
   id: string;
-  task: string;
-  priority: 'High' | 'Medium' | 'Low';
-  assignedTo: string;
-  deadline: string;
-  status: 'Done' | 'In Progress' | 'Pending';
+  date: string;
+  title: string;
+  amount: number;
+  category: string;
 }
 
 export interface AccountRecord {
@@ -168,9 +170,4 @@ export interface AccountRecord {
   name: string;
   type: 'Asset' | 'Liability' | 'Equity' | 'Revenue' | 'Expense';
   balance: number;
-}
-
-export interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
 }
