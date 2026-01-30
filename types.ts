@@ -72,6 +72,13 @@ export interface Supplier {
   status: 'Active' | 'Blocked';
   isPendingDeletion?: boolean;
   createdAt?: string;
+  // New fields requested
+  address?: string;
+  tin?: string;
+  bin?: string;
+  contactPersonName?: string;
+  contactPersonNumber?: string;
+  contactPersonEmail?: string;
 }
 
 export interface Transaction {
@@ -170,4 +177,29 @@ export interface AccountRecord {
   name: string;
   type: 'Asset' | 'Liability' | 'Equity' | 'Revenue' | 'Expense';
   balance: number;
+}
+
+// Added LegalDoc to fix missing export error in App.tsx and Legal.tsx
+export interface LegalDoc {
+  id: string;
+  title: string;
+  type: string;
+  status: 'Active' | 'Expired' | 'Pending';
+  expiryDate: string;
+}
+
+// Added OfficeTask to fix missing export error in App.tsx and Office.tsx
+export interface OfficeTask {
+  id: string;
+  task: string;
+  assignedTo: string;
+  deadline: string;
+  priority: 'High' | 'Medium' | 'Low';
+  status: 'Pending' | 'In Progress' | 'Done';
+}
+
+// Added ChatMessage to fix missing export error in SupportAI.tsx
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
 }

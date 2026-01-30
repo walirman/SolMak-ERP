@@ -47,6 +47,16 @@ const MOCK_ACCOUNTS: AccountRecord[] = [
   { id: 'ACC-102', name: 'Corporate Bank (BRAC)', type: 'Asset', balance: 2500000 },
 ];
 
+const MOCK_TASKS: OfficeTask[] = [
+  { id: 'TK-1', task: 'Finalize quarterly audit', assignedTo: 'Arif Faisal', deadline: '2024-02-15', priority: 'High', status: 'In Progress' },
+  { id: 'TK-2', task: 'Update employee handbook', assignedTo: 'Tania Sultana', deadline: '2024-02-20', priority: 'Medium', status: 'Pending' }
+];
+
+const MOCK_LEGAL: LegalDoc[] = [
+  { id: 'DOC-1', title: 'Trade License 2024', type: 'Permit', status: 'Active', expiryDate: '2024-12-31' },
+  { id: 'DOC-2', title: 'Office Lease Agreement', type: 'Contract', status: 'Active', expiryDate: '2025-06-30' }
+];
+
 const INITIAL_USER: UserRecord = {
   id: 'root-admin',
   name: 'SolMak Super User',
@@ -118,6 +128,16 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : MOCK_ACCOUNTS;
   });
 
+  const [tasks, setTasks] = useState<OfficeTask[]>(() => {
+    const saved = localStorage.getItem(`erp_tasks_${activeTenantId}`);
+    return saved ? JSON.parse(saved) : MOCK_TASKS;
+  });
+
+  const [docs, setDocs] = useState<LegalDoc[]>(() => {
+    const saved = localStorage.getItem(`erp_docs_${activeTenantId}`);
+    return saved ? JSON.parse(saved) : MOCK_LEGAL;
+  });
+
   const persist = useCallback(() => {
     localStorage.setItem(`erp_tenants_${STORAGE_VERSION}`, JSON.stringify(tenants));
     localStorage.setItem('erp_active_tenant_id', activeTenantId);
@@ -129,7 +149,9 @@ const App: React.FC = () => {
     localStorage.setItem(`erp_sales_${activeTenantId}`, JSON.stringify(sales));
     localStorage.setItem(`erp_emp_${activeTenantId}`, JSON.stringify(employees));
     localStorage.setItem(`erp_acc_${activeTenantId}`, JSON.stringify(accounts));
-  }, [tenants, activeTenantId, currentUserId, transactions, inventory, suppliers, purchaseOrders, sales, employees, accounts]);
+    localStorage.setItem(`erp_tasks_${activeTenantId}`, JSON.stringify(tasks));
+    localStorage.setItem(`erp_docs_${activeTenantId}`, JSON.stringify(docs));
+  }, [tenants, activeTenantId, currentUserId, transactions, inventory, suppliers, purchaseOrders, sales, employees, accounts, tasks, docs]);
 
   useEffect(() => persist(), [persist]);
 
@@ -152,7 +174,7 @@ const App: React.FC = () => {
       case 'PURCHASE':
         return <Purchase t={t} purchaseOrders={purchaseOrders} setPurchaseOrders={setPurchaseOrders} inventory={inventory} setInventory={setInventory} suppliers={suppliers} themeColor={effectiveTheme} darkMode={config.darkMode} lang={lang} currentUser={currentUser} />;
       case 'SUPPLIERS':
-        return <Suppliers t={t} suppliers={suppliers} setSuppliers={setSuppliers} transactions={transactions} themeColor={effectiveTheme} darkMode={config.darkMode} lang={lang} />;
+        return <Suppliers t={t} suppliers={suppliers} setSuppliers={setSuppliers} transactions={transactions} themeColor={effectiveTheme} darkMode={config.darkMode} lang={lang} currentUser={currentUser} />;
       case 'SALES':
         return <Sales t={t} sales={sales} setSales={setSales} inventory={inventory} setInventory={setInventory} transactions={transactions} setTransactions={setTransactions} themeColor={effectiveTheme} darkMode={config.darkMode} lang={lang} />;
       case 'HR':
@@ -167,6 +189,14 @@ const App: React.FC = () => {
         return <SupportAI themeColor={effectiveTheme} t={t} lang={lang} darkMode={config.darkMode} />;
       case 'SUPER_ADMIN':
         return <SuperAdmin t={t} lang={lang} config={config} tenants={tenants} setTenants={setTenants} activeTenantId={activeTenantId} setActiveTenantId={setActiveTenantId} inventory={inventory} setInventory={setInventory} transactions={transactions} setTransactions={setTransactions} darkMode={config.darkMode} onUpdateOrder={(newOrder) => setTenants(tenants.map(t => t.id === activeTenantId ? {...t, config: {...t.config, moduleOrder: newOrder}} : t))} currentUser={currentUser} />;
+      case 'OFFICE':
+        return <Office t={t} tasks={tasks} setTasks={setTasks} themeColor={effectiveTheme} darkMode={config.darkMode} lang={lang} />;
+      case 'LEGAL':
+        return <Legal t={t} docs={docs} setDocs={setDocs} themeColor={effectiveTheme} darkMode={config.darkMode} lang={lang} />;
+      case 'REPORTS':
+        return <Reports t={t} sales={sales} transactions={transactions} inventory={inventory} darkMode={config.darkMode} themeColor={effectiveTheme} />;
+      case 'CATEGORIES':
+        return <Categories t={t} themeColor={effectiveTheme} darkMode={config.darkMode} lang={lang} />;
       default:
         return <EmptyModule name={activeModule} t={t} />;
     }
@@ -177,7 +207,7 @@ const App: React.FC = () => {
       <Sidebar appName={activeTenant.name} modules={sortedModules} activeModule={activeModule} setActiveModule={setActiveModule} themeColor={effectiveTheme} logoUrl={config.logoUrl} t={t} currentUser={currentUser} darkMode={config.darkMode} />
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Header appName={activeTenant.name} activeModule={activeModule} setActiveModule={setActiveModule} themeColor={effectiveTheme} lang={lang} setLang={setLang} t={t} currentUser={currentUser} allUsers={activeTenant.users} setCurrentUserId={setCurrentUserId} transactions={transactions} darkMode={config.darkMode} toggleDarkMode={() => setTenants(tenants.map(t => t.id === activeTenantId ? {...t, config: {...t.config, darkMode: !t.config.darkMode}} : t))} />
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 animate-fade-in smooth-scroll">{renderModule()}</main>
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 animate-fade-in smooth-scroll overflow-x-hidden">{renderModule()}</main>
       </div>
     </div>
   );
